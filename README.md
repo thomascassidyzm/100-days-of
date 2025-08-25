@@ -1,5 +1,35 @@
-# Vue 3 + TypeScript + Vite
+# 100DaysOf - Language Learning Platform
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Become interactionally confident in 100 days with daily sessions, structured programmes, and the revolutionary SaySomethingIn method.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## Features
+
+- 🎯 100-day structured language programmes
+- 💬 Daily coaching sessions
+- 📱 Mobile-responsive design
+- 🌙 Beautiful dark theme with red accents
+- 🗣️ Focus on conversational confidence
+- 📊 Progress tracking
+- 💰 Transparent pricing (£100 for 100 days, £30/month ongoing)
+
+## Tech Stack
+
+- Vue 3 + TypeScript
+- Tailwind CSS
+- Vue Router
+- Vite
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+Built with ❤️ for language learners everywhere.
