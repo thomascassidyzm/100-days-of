@@ -213,7 +213,7 @@ const router = useRouter()
 
 const selectProgramme = (language: string) => {
   localStorage.setItem('selectedLanguage', language)
-  router.push('/programmes')
+  router.push('/checkout')
 }
 
 const tryMasterCast = () => {

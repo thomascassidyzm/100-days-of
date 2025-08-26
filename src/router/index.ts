@@ -50,6 +50,22 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/checkout',
+    name: 'Checkout',
+    component: () => import('../pages/CheckoutPage.vue'),
+    meta: {
+      title: 'Checkout - 100 Days Of'
+    }
+  },
+  {
+    path: '/success',
+    name: 'Success',
+    component: () => import('../pages/SuccessPage.vue'),
+    meta: {
+      title: 'Welcome to Your Journey! - 100 Days Of'
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     redirect: '/'
