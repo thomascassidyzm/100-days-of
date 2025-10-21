@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-ssi-dark text-ssi-text antialiased;
+    margin: 0;
+    min-height: 100vh;
+  }
+  
+  /* Custom scrollbar for dark theme */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-ssi-dark-lighter;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-ssi-gray-light rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-ssi-red-dark;
+  }
+  
+  /* Selection color */
+  ::selection {
+    @apply bg-ssi-red text-white;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-ssi-red hover:bg-ssi-red-dark text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-ssi-gray hover:bg-ssi-gray-light text-ssi-text font-medium py-3 px-6 rounded-lg transition-all duration-200 border border-ssi-gray-light;
+  }
+  
+  .card-dark {
+    @apply bg-ssi-dark-lighter border border-ssi-gray rounded-xl p-6 shadow-xl;
+  }
+  
+  .input-dark {
+    @apply bg-ssi-gray border border-ssi-gray-light text-ssi-text rounded-lg px-4 py-3 focus:outline-none focus:border-ssi-red transition-colors;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-ssi-red to-ssi-red-light bg-clip-text text-transparent;
+  }
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
