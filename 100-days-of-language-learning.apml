@@ -1,0 +1,1105 @@
+# =============================================================================
+# 100DAYSOF LANGUAGE LEARNING PLATFORM - APML v1.1.0 SPECIFICATION
+# Single Source of Truth (SSoT)
+# =============================================================================
+
+app 100DaysOfLanguageLearning:
+  title: "100DaysOf - Accelerated Language Learning Platform"
+  version: "1.0.0"
+  apml_specification_version: "1.1.0"
+  generated_at: "2025-10-21"
+
+  pss_compliance:
+    structure_standard: "APML-PSS v1.0.0"
+    self_documentation: enabled
+    interface_sections: 4
+
+  deterministic_compilation:
+    primary_target: "Vue3 + TypeScript + Tailwind CSS"
+    alternative_targets: ["PWA", "Mobile-First-Web"]
+    compilation_guarantee: identical_input_produces_identical_output
+
+# =============================================================================
+# SYSTEM INTENT AND ARCHITECTURE
+# =============================================================================
+
+## System Purpose
+
+MISSION:
+  Enable learners to achieve **interactional confidence** in a new language within a structured timeframe using the SaySomethingIn methodology combined with AI-powered conversational practice.
+
+CORE_INNOVATION:
+  - Parametrisable curriculum (30/60/90/100 day options)
+  - Daily prescriptive lessons using 668 canonical SEEDS
+  - AI voice coach that ONLY uses learned vocabulary
+  - Voice-first practice with Hume.ai emotional voice synthesis
+  - Progressive complexity calibrated to course duration
+
+SUCCESS_CRITERIA:
+  - Learner completes daily sessions consistently
+  - Achieves conversational fluency using course vocabulary
+  - Gains confidence speaking in real-time voice interactions
+  - Can construct novel sentences from learned building blocks (LEGOs)
+
+## System Architecture
+
+```
+                    100DAYSOF PLATFORM ARCHITECTURE
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                    INTERFACE SECTION 1: ONBOARDING                   │
+│  - Language selection (target + known)                              │
+│  - Course duration selection (30/60/90/100 days)                    │
+│  - Voice setup and mic testing                                      │
+│  - Payment and account creation                                     │
+└─────────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────────┐
+│               INTERFACE SECTION 2: DAILY PRACTICE                    │
+│  - Curriculum Engine (calculates daily SEEDS)                       │
+│  - Voice Coach (AI conversational practice)                         │
+│  - Progress tracking and mastery scoring                            │
+│  - Session completion and unlock system                             │
+└─────────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────────┐
+│             INTERFACE SECTION 3: VOICE & AI SERVICES                 │
+│  - Hume.ai voice synthesis (emotional TTS)                          │
+│  - Web Speech API (STT for user input)                              │
+│  - Claude Sonnet 4.5 (coaching intelligence)                        │
+│  - Course content API (SEEDS + LEGOs)                               │
+└─────────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────────┐
+│           INTERFACE SECTION 4: PROGRESS & MANAGEMENT                 │
+│  - Dashboard (100-day calendar view)                                │
+│  - Statistics and analytics                                         │
+│  - Settings and preferences                                         │
+│  - Subscription management                                          │
+└─────────────────────────────────────────────────────────────────────┘
+
+                    DATA STRUCTURES
+┌─────────────────────────────────────────────────────────────────────┐
+│  - Course configurations (languages, durations, pacing)             │
+│  - SEED corpus (668 canonical sentences)                            │
+│  - LEGO_PAIRS (building blocks from course generation)              │
+│  - User progress (completed days, mastery scores)                   │
+│  - Session logs (practice history, breakthrough moments)            │
+└─────────────────────────────────────────────────────────────────────┘
+
+                    VFS (VIRTUAL FILE SYSTEM)
+┌─────────────────────────────────────────────────────────────────────┐
+│  /vfs/courses/                                                       │
+│    ├── spa_for_eng_speakers/                                        │
+│    │   ├── translations.json    (668 SEED_PAIRS)                   │
+│    │   ├── baskets.json         (LEGO_BASKETS with e-phrases)     │
+│    │   └── manifest.json        (course metadata)                  │
+│    ├── cmn_for_eng_speakers/                                        │
+│    ├── gle_for_eng_speakers/                                        │
+│    └── fra_for_eng_speakers/                                        │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+# =============================================================================
+# VARIABLE REGISTRY
+# =============================================================================
+
+## COURSE CONFIGURATION VARIABLES
+
+### CourseConfig (Core Configuration Object)
+
+```typescript
+REACTIVE_VARIABLES:
+  - selectedLanguagePair: ref<LanguagePair>
+    PURPOSE: Stores target and known language selection
+    DEFAULT: { target: "", known: "eng" }
+    VALIDATION: both target and known must be valid ISO 639-3 codes
+
+  - selectedDuration: ref<CourseDuration>
+    PURPOSE: Number of days for course completion
+    DEFAULT: 60
+    VALIDATION: must be 30 | 60 | 90 | 100
+
+  - dailySeedAllocation: computed<number>
+    PURPOSE: Calculates seeds per day based on duration
+    DERIVES_FROM: [selectedDuration]
+    FORMULA: Math.floor(668 / selectedDuration)
+
+  - currentDay: ref<number>
+    PURPOSE: Tracks current day in course (1-indexed)
+    DEFAULT: 1
+    VALIDATION: 1 <= currentDay <= selectedDuration
+
+  - completedSeeds: ref<number[]>
+    PURPOSE: Array of seed IDs user has completed
+    DEFAULT: []
+    VALIDATION: all elements must be 1 <= id <= 668
+
+  - masteryScores: ref<Record<number, number>>
+    PURPOSE: Maps seedId → mastery score (0.0 to 1.0)
+    DEFAULT: {}
+    VALIDATION: all values must be 0.0 <= score <= 1.0
+
+TYPE_DEFINITIONS:
+  - LanguagePair:
+      target: string        // ISO 639-3 code (e.g., "spa")
+      known: string         // ISO 639-3 code (e.g., "eng")
+      targetName: string    // Display name (e.g., "Spanish")
+      knownName: string     // Display name (e.g., "English")
+
+  - CourseDuration: 30 | 60 | 90 | 100
+
+  - SeedPair:
+      id: number           // 1-668
+      known: string        // English sentence
+      target: string       // Target language translation
+
+  - LegoPair:
+      base: string         // Base unit in target language
+      translation: string  // Known language meaning
+      type: "BASE" | "COMPOSITE"
+```
+
+## CURRICULUM ENGINE VARIABLES
+
+### CurriculumEngine (Daily Lesson Calculator)
+
+```typescript
+METHODS:
+  - getDailyLesson: function
+    PURPOSE: Calculates which SEEDS to introduce/review today
+    PARAMETERS: dayNumber: number
+    RETURNS: DailyLesson
+    SIDE_EFFECTS: none (pure function)
+
+  - getNewSeeds: function
+    PURPOSE: Returns seeds to introduce today
+    PARAMETERS: dayNumber: number
+    RETURNS: SeedPair[]
+    FORMULA: seeds[(day-1)*perDay+1 : day*perDay]
+
+  - getReviewSeeds: function
+    PURPOSE: Returns seeds for spaced repetition review
+    PARAMETERS: dayNumber: number, masteryScores: Record<number, number>
+    RETURNS: SeedPair[]
+    LOGIC: prioritize seeds with lowest mastery scores
+
+  - calculateProgress: function
+    PURPOSE: Computes completion percentage and streaks
+    PARAMETERS: completedDays: number[], totalDays: number
+    RETURNS: ProgressStats
+
+TYPE_DEFINITIONS:
+  - DailyLesson:
+      day: number
+      newSeeds: SeedPair[]
+      reviewSeeds: SeedPair[]
+      totalVocabulary: number
+      estimatedDuration: number      // minutes
+
+  - ProgressStats:
+      percentComplete: number        // 0-100
+      daysCompleted: number
+      currentStreak: number
+      longestStreak: number
+```
+
+## VOICE COACH VARIABLES
+
+### LanguageCoach (AI Conversational Practice)
+
+```typescript
+REACTIVE_VARIABLES:
+  - conversationHistory: ref<Message[]>
+    PURPOSE: Stores all messages in current session
+    DEFAULT: []
+    VALIDATION: alternating user/assistant roles
+
+  - isListening: ref<boolean>
+    PURPOSE: Tracks if coach is listening to user speech
+    DEFAULT: false
+
+  - isSpeaking: ref<boolean>
+    PURPOSE: Tracks if coach is generating speech
+    DEFAULT: false
+
+  - knownPhrases: computed<LegoPair[]>
+    PURPOSE: All vocabulary learner can use today
+    DERIVES_FROM: [currentDay, completedSeeds]
+
+  - coachPersonality: ref<CoachConfig>
+    PURPOSE: AI coaching parameters
+    DEFAULT: { encouragement: "high", correctionStyle: "gentle", emotion: "encouraging" }
+
+METHODS:
+  - sendMessage: async function
+    PURPOSE: Sends user message to AI, receives response
+    PARAMETERS: message: string, voiceInput: boolean
+    RETURNS: Promise<CoachResponse>
+    SIDE_EFFECTS: updates conversationHistory, triggers TTS
+
+  - buildCoachPrompt: function
+    PURPOSE: Generates system prompt with known vocabulary
+    PARAMETERS: lesson: DailyLesson, knownPhrases: LegoPair[]
+    RETURNS: string (system prompt)
+
+  - detectBreakthrough: function
+    PURPOSE: Identifies "aha!" moments in conversation
+    PARAMETERS: message: string
+    RETURNS: boolean
+    LOGIC: regex patterns for breakthrough language
+
+TYPE_DEFINITIONS:
+  - Message:
+      role: "user" | "assistant"
+      content: string
+      timestamp: Date
+      voiceInput: boolean
+
+  - CoachResponse:
+      message: string
+      shouldSpeak: boolean
+      emotion: "encouraging" | "corrective" | "celebratory"
+      detectedBreakthrough: boolean
+
+  - CoachConfig:
+      encouragement: "low" | "medium" | "high"
+      correctionStyle: "direct" | "gentle" | "socratic"
+      emotion: string                // Hume.ai emotion parameter
+```
+
+## HUME.AI VOICE SERVICE VARIABLES
+
+### HumeVoiceService (Text-to-Speech & Speech-to-Text)
+
+```typescript
+REACTIVE_VARIABLES:
+  - selectedVoice: ref<HumeVoice>
+    PURPOSE: Voice ID for target language synthesis
+    DEFAULT: depends on language (e.g., Spanish female voice)
+    VALIDATION: must be valid Hume.ai voice ID
+
+  - audioQueue: ref<AudioBuffer[]>
+    PURPOSE: Queued audio responses to play
+    DEFAULT: []
+
+  - isPlaying: ref<boolean>
+    PURPOSE: Tracks if audio is currently playing
+    DEFAULT: false
+
+METHODS:
+  - synthesizeSpeech: async function
+    PURPOSE: Converts text to speech using Hume.ai API
+    PARAMETERS: text: string, emotion: string
+    RETURNS: Promise<AudioBuffer>
+    SIDE_EFFECTS: makes API call to Hume.ai
+
+  - playAudio: async function
+    PURPOSE: Plays audio buffer through Web Audio API
+    PARAMETERS: audioBuffer: AudioBuffer
+    RETURNS: Promise<void>
+    SIDE_EFFECTS: updates isPlaying state
+
+  - startListening: async function
+    PURPOSE: Captures user speech via Web Speech API
+    RETURNS: Promise<string>
+    SIDE_EFFECTS: requests microphone permission
+
+  - stopListening: function
+    PURPOSE: Stops speech recognition
+    RETURNS: void
+
+TYPE_DEFINITIONS:
+  - HumeVoice:
+      id: string                     // Hume.ai voice identifier
+      language: string               // ISO code
+      gender: "male" | "female" | "neutral"
+      emotionRange: string[]         // Supported emotions
+```
+
+## API ENDPOINTS
+
+### Backend API Routes
+
+```
+ENDPOINTS:
+  - /api/language-coach
+    METHOD: POST
+    PURPOSE: Sends message to AI coach, receives response
+    PARAMETERS:
+      message: string
+      courseConfig: CourseConfig
+      currentDay: number
+      conversationHistory: Message[]
+    RETURNS: CoachResponse
+
+  - /api/courses/:languagePair/manifest
+    METHOD: GET
+    PURPOSE: Fetches course content (SEEDS + LEGOs)
+    PARAMETERS: languagePair: string (e.g., "spa_for_eng")
+    RETURNS: CourseManifest
+
+  - /api/progress
+    METHOD: GET/POST
+    PURPOSE: Loads or saves user progress
+    PARAMETERS: userId: string, courseConfig: CourseConfig
+    RETURNS: UserProgress
+
+  - /api/hume/synthesize
+    METHOD: POST
+    PURPOSE: Proxies Hume.ai TTS requests (keeps API key secure)
+    PARAMETERS: text: string, voiceId: string, emotion: string
+    RETURNS: AudioBuffer
+
+TYPE_DEFINITIONS:
+  - CourseManifest:
+      languagePair: LanguagePair
+      seeds: SeedPair[]              // All 668 seeds
+      legoBaskets: LegoPair[]        // Building blocks
+      metadata:
+        version: string
+        generatedAt: Date
+```
+
+## DATABASE SCHEMA
+
+```sql
+TABLES:
+  - users
+    COLUMNS:
+      - id: UUID PRIMARY KEY
+      - email: VARCHAR(255) NOT NULL UNIQUE
+      - created_at: TIMESTAMP DEFAULT NOW()
+
+  - courses
+    COLUMNS:
+      - id: UUID PRIMARY KEY
+      - user_id: UUID REFERENCES users(id)
+      - language_pair: VARCHAR(50) NOT NULL
+        FORMAT: "{target}_for_{known}"
+        EXAMPLE: "spa_for_eng"
+      - duration: INTEGER NOT NULL
+        VALIDATION: CHECK (duration IN (30, 60, 90, 100))
+      - start_date: DATE NOT NULL
+      - current_day: INTEGER DEFAULT 1
+      - created_at: TIMESTAMP DEFAULT NOW()
+
+  - progress
+    COLUMNS:
+      - id: UUID PRIMARY KEY
+      - course_id: UUID REFERENCES courses(id)
+      - day_number: INTEGER NOT NULL
+      - completed_at: TIMESTAMP
+      - seeds_introduced: INTEGER[]
+      - mastery_scores: JSONB
+        FORMAT: {"seedId": masteryScore}
+        EXAMPLE: {"1": 0.85, "2": 0.92}
+
+  - sessions
+    COLUMNS:
+      - id: UUID PRIMARY KEY
+      - course_id: UUID REFERENCES courses(id)
+      - day_number: INTEGER NOT NULL
+      - started_at: TIMESTAMP DEFAULT NOW()
+      - ended_at: TIMESTAMP
+      - conversation_log: JSONB
+        FORMAT: Message[]
+      - breakthroughs: INTEGER DEFAULT 0
+
+CONSTRAINTS:
+  - progress_unique_day: UNIQUE(course_id, day_number)
+  - course_language_format: CHECK(language_pair ~ '^[a-z]{3}_for_[a-z]{3}$')
+  - valid_duration: CHECK(duration IN (30, 60, 90, 100))
+```
+
+## CONFIGURATION CONSTANTS
+
+```
+ENVIRONMENT_VARIABLES:
+  - VITE_ANTHROPIC_API_KEY: string
+    PURPOSE: Claude API key for coaching intelligence
+    REQUIRED: true
+
+  - VITE_HUME_API_KEY: string
+    PURPOSE: Hume.ai API key for voice synthesis
+    REQUIRED: true
+
+  - VITE_SSI_COURSE_API: string
+    PURPOSE: Base URL for SSi course content API
+    DEFAULT: "http://localhost:54321/api"
+
+  - VITE_STRIPE_PUBLISHABLE_KEY: string
+    PURPOSE: Stripe payment processing
+    REQUIRED: true (production only)
+
+FEATURE_FLAGS:
+  - ENABLE_VOICE_PRACTICE: boolean
+    DEFAULT: true
+    PURPOSE: Toggle voice input/output features
+
+  - ENABLE_HUME_VOICES: boolean
+    DEFAULT: true
+    PURPOSE: Use Hume.ai vs native browser TTS
+
+  - ENABLE_SPACED_REPETITION: boolean
+    DEFAULT: true
+    PURPOSE: Use SRS algorithm for review seeds
+
+  - DEBUG_MODE: boolean
+    DEFAULT: false (true in development)
+    PURPOSE: Show curriculum calculation details
+
+BUILD_CONSTANTS:
+  - TOTAL_SEEDS: 668
+  - DEFAULT_COURSE_DURATION: 60
+  - DEFAULT_SESSION_MINUTES: 15
+  - MAX_REVIEW_SEEDS_PER_DAY: 20
+```
+
+# =============================================================================
+# INTERFACE SECTION 1: ONBOARDING & SETUP
+# =============================================================================
+
+## Purpose
+Guide new users through language selection, course duration choice, voice setup, and payment.
+
+## Components
+
+### LanguageSelector.vue
+```
+REACTIVE_VARIABLES:
+  - availableLanguages: ref<Language[]>
+  - searchQuery: ref<string>
+  - selectedTarget: ref<Language | null>
+  - selectedKnown: ref<Language | null>
+
+COMPUTED:
+  - filteredLanguages: computed<Language[]>
+    DERIVES_FROM: [availableLanguages, searchQuery]
+
+METHODS:
+  - selectLanguage: (type: 'target' | 'known', language: Language) => void
+  - confirmSelection: () => void
+
+DATA_SOURCE:
+  - API: /api/languages
+  - Returns: Language[] with ISO codes and display names
+```
+
+### DurationSelector.vue
+```
+REACTIVE_VARIABLES:
+  - selectedDuration: ref<CourseDuration>
+  - showComparison: ref<boolean>
+
+COMPUTED:
+  - seedsPerDay: computed<number>
+  - estimatedDailyMinutes: computed<number>
+  - courseEndDate: computed<Date>
+
+METHODS:
+  - selectDuration: (duration: CourseDuration) => void
+  - proceedToCheckout: () => void
+```
+
+### VoiceSetup.vue
+```
+REACTIVE_VARIABLES:
+  - microphoneGranted: ref<boolean>
+  - testRecording: ref<string | null>
+  - selectedVoice: ref<HumeVoice>
+
+METHODS:
+  - requestMicrophonePermission: async () => Promise<boolean>
+  - testVoiceInput: async () => Promise<string>
+  - testVoiceOutput: async (sampleText: string) => Promise<void>
+  - confirmSetup: () => void
+```
+
+## User Flow
+
+1. User lands on homepage → "Start Learning" button
+2. LanguageSelector: Choose target language (e.g., Spanish)
+3. LanguageSelector: Confirm known language (defaults to English)
+4. DurationSelector: Choose course length (30/60/90/100 days)
+5. VoiceSetup: Test microphone and voice synthesis
+6. CheckoutPage: Payment (£100 for course, then £30/month)
+7. SuccessPage: Account created, Day 1 unlocked
+
+# =============================================================================
+# INTERFACE SECTION 2: DAILY PRACTICE & COACHING
+# =============================================================================
+
+## Purpose
+Core learning experience: daily lesson with AI voice coach for conversational practice.
+
+## Components
+
+### DailySession.vue (Main Practice Page)
+```
+REACTIVE_VARIABLES:
+  - currentLesson: ref<DailyLesson>
+  - sessionStartTime: ref<Date>
+  - conversationActive: ref<boolean>
+
+COMPUTED:
+  - sessionProgress: computed<number>
+  - vocabularyCount: computed<number>
+
+METHODS:
+  - loadDailyLesson: async (dayNumber: number) => Promise<DailyLesson>
+  - startSession: () => void
+  - completeSession: () => void
+  - unlockNextDay: () => void
+
+CHILD_COMPONENTS:
+  - SeedIntroduction.vue (shows new seeds for today)
+  - VoiceCoach.vue (conversational practice)
+  - ProgressIndicator.vue (session progress bar)
+```
+
+### VoiceCoach.vue (Chat + Voice Interface)
+```
+REACTIVE_VARIABLES:
+  - messages: ref<Message[]>
+  - userInput: ref<string>
+  - isListening: ref<boolean>
+  - isSpeaking: ref<boolean>
+  - knownVocabulary: ref<LegoPair[]>
+
+METHODS:
+  - startVoiceInput: async () => Promise<void>
+  - stopVoiceInput: () => void
+  - sendMessage: async (text: string, isVoice: boolean) => Promise<void>
+  - playCoachResponse: async (text: string) => Promise<void>
+
+SERVICES_USED:
+  - HumeVoiceService (TTS/STT)
+  - LanguageCoachAPI (Claude intelligence)
+  - CurriculumEngine (known vocabulary)
+```
+
+### SeedIntroduction.vue (Teach New Seeds)
+```
+REACTIVE_VARIABLES:
+  - newSeeds: ref<SeedPair[]>
+  - currentSeedIndex: ref<number>
+  - userHasRepeated: ref<Record<number, boolean>>
+
+METHODS:
+  - playTargetAudio: async (seedId: number) => Promise<void>
+  - repeatAfterMe: async (seedId: number) => Promise<string>
+  - nextSeed: () => void
+  - finishIntroduction: () => void
+
+USER_FLOW:
+  1. Coach introduces today's 11 new seeds
+  2. Plays audio for each seed in target language
+  3. User repeats each seed (voice recording)
+  4. Coach confirms pronunciation
+  5. Proceed to conversational practice
+```
+
+## AI Coach System Prompt (Dynamic)
+
+```
+SYSTEM_PROMPT_TEMPLATE:
+  You are a language practice coach for ${courseName}.
+
+  TODAY: Day ${currentDay}/${totalDays}
+  NEW MATERIAL: Seeds ${newSeedIds[0]}-${newSeedIds[newSeedIds.length-1]}
+  TOTAL VOCABULARY: ${knownPhrases.length} phrases
+
+  KNOWN PHRASES (what learner can use):
+  ${knownPhrases.map(p => `- ${p.target} (${p.known})`).join('\n')}
+
+  YOUR ROLE:
+  1. Have natural conversations using ONLY these phrases
+  2. Introduce today's new phrases naturally in context
+  3. If learner tries unknown phrases → "Try with what you know"
+  4. Keep responses SHORT (1-2 sentences) for voice practice
+  5. Speak naturally, encouragingly, conversationally
+
+  Voice-first: Assume user is speaking, respond conversationally.
+
+EXAMPLE_CONVERSATION:
+  Coach: "¡Hola! ¿Quieres hablar español hoy?"
+  User: "Sí, quiero hablar"
+  Coach: "¡Perfecto! ¿Qué quieres hacer?"
+  User: "Quiero aprender más"
+  Coach: "¡Muy bien! Hoy vamos a practicar..."
+```
+
+# =============================================================================
+# INTERFACE SECTION 3: VOICE & AI SERVICES
+# =============================================================================
+
+## Purpose
+Backend services for voice synthesis, speech recognition, and AI coaching intelligence.
+
+## Services
+
+### HumeVoiceService.ts
+```typescript
+class HumeVoiceService {
+  private apiKey: string
+  private voiceId: string
+  private audioContext: AudioContext
+
+  async synthesizeSpeech(text: string, emotion: string): Promise<AudioBuffer>
+  async playAudio(buffer: AudioBuffer): Promise<void>
+  async startListening(language: string): Promise<string>
+  stopListening(): void
+}
+
+HUME_API_INTEGRATION:
+  - Endpoint: https://api.hume.ai/v1/tts
+  - Method: POST
+  - Headers: Authorization: Bearer ${HUME_API_KEY}
+  - Body:
+      text: string
+      voice_id: string
+      emotion: string (e.g., "encouraging", "celebratory")
+      language: string (ISO code)
+  - Response: AudioBuffer (WAV/MP3)
+```
+
+### LanguageCoachAPI.ts
+```typescript
+// API: /api/language-coach
+async function sendCoachMessage(request: CoachRequest): Promise<CoachResponse> {
+  // 1. Load today's curriculum
+  const lesson = curriculumEngine.getDailyLesson(request.currentDay)
+  const knownPhrases = await getKnownPhrases(lesson)
+
+  // 2. Build dynamic system prompt
+  const systemPrompt = buildCoachPrompt(request.courseConfig, lesson, knownPhrases)
+
+  // 3. Call Claude Sonnet 4.5
+  const response = await anthropic.messages.create({
+    model: 'claude-sonnet-4-5-20250929',
+    max_tokens: 200,  // Short for voice
+    messages: [
+      { role: 'user', content: systemPrompt },
+      ...request.conversationHistory,
+      { role: 'user', content: request.message }
+    ]
+  })
+
+  // 4. Return response with voice metadata
+  return {
+    message: response.content[0].text,
+    shouldSpeak: true,
+    emotion: detectEmotion(request.message),
+    detectedBreakthrough: detectBreakthrough(request.message)
+  }
+}
+```
+
+### CourseContentAPI.ts
+```typescript
+// Fetches course manifest from SSi Dashboard VFS
+async function getCourseManifest(languagePair: string): Promise<CourseManifest> {
+  const response = await fetch(
+    `${SSI_COURSE_API}/courses/${languagePair}/manifest`
+  )
+
+  return {
+    seeds: await loadSeeds(languagePair),       // 668 SEED_PAIRS
+    legoBaskets: await loadBaskets(languagePair) // LEGO_PAIRS
+  }
+}
+
+DATA_SOURCE:
+  - SSi Dashboard automation_server.cjs
+  - VFS path: /vfs/courses/{language_pair}/
+  - Files: translations.json, baskets.json
+```
+
+# =============================================================================
+# INTERFACE SECTION 4: PROGRESS & DASHBOARD
+# =============================================================================
+
+## Purpose
+100-day calendar view, progress statistics, settings, and subscription management.
+
+## Components
+
+### DashboardView.vue
+```
+REACTIVE_VARIABLES:
+  - userCourses: ref<Course[]>
+  - selectedCourse: ref<Course | null>
+  - calendarDays: computed<CalendarDay[]>
+
+COMPUTED:
+  - progressPercentage: computed<number>
+  - currentStreak: computed<number>
+  - totalVocabulary: computed<number>
+
+METHODS:
+  - selectDay: (dayNumber: number) => void
+  - continuePractice: () => void
+  - viewStatistics: () => void
+```
+
+### CalendarView.vue
+```
+REACTIVE_VARIABLES:
+  - days: ref<CalendarDay[]>
+  - hoveredDay: ref<number | null>
+
+TYPE_DEFINITIONS:
+  - CalendarDay:
+      dayNumber: number
+      status: "locked" | "unlocked" | "completed"
+      completedAt: Date | null
+      seedsIntroduced: number
+      sessionDuration: number
+```
+
+### StatisticsView.vue
+```
+COMPUTED_METRICS:
+  - totalDaysCompleted: number
+  - currentStreak: number
+  - longestStreak: number
+  - totalVocabulary: number
+  - averageSessionLength: number
+  - breakthroughMoments: number
+
+VISUALIZATIONS:
+  - Progress chart (days completed over time)
+  - Vocabulary growth curve
+  - Streak calendar heatmap
+  - Mastery distribution histogram
+```
+
+### SettingsView.vue
+```
+REACTIVE_VARIABLES:
+  - voiceSettings: ref<VoiceSettings>
+  - notificationSettings: ref<NotificationSettings>
+  - displaySettings: ref<DisplaySettings>
+
+METHODS:
+  - updateVoiceSettings: (settings: VoiceSettings) => void
+  - toggleNotifications: () => void
+  - changeTheme: (theme: "light" | "dark") => void
+  - exportProgress: () => void
+```
+
+# =============================================================================
+# DATA STRUCTURES
+# =============================================================================
+
+## Canonical SEEDS Corpus
+
+```
+SOURCE: SSi Dashboard course generation system
+LOCATION: /vfs/courses/{language_pair}/translations.json
+
+STRUCTURE:
+  SEED_PAIRS: [
+    {
+      id: 1,
+      known: "I want to speak",
+      target: "Quiero hablar"
+    },
+    ...
+    {
+      id: 668,
+      known: "I'm looking forward to seeing you",
+      target: "Estoy deseando verte"
+    }
+  ]
+```
+
+## LEGO Building Blocks
+
+```
+SOURCE: SSi Dashboard Phase 3 output
+LOCATION: /vfs/courses/{language_pair}/baskets.json
+
+STRUCTURE:
+  LEGO_BASKETS: [
+    {
+      seedId: 1,
+      legoPairs: [
+        {
+          base: "quiero",
+          translation: "I want",
+          type: "BASE"
+        },
+        {
+          base: "hablar",
+          translation: "to speak",
+          type: "BASE"
+        }
+      ]
+    }
+  ]
+```
+
+## Course Manifest Schema
+
+```json
+{
+  "languagePair": {
+    "target": "spa",
+    "known": "eng",
+    "targetName": "Spanish",
+    "knownName": "English"
+  },
+  "metadata": {
+    "version": "7.6.0",
+    "generatedAt": "2025-10-20T00:00:00Z",
+    "totalSeeds": 668,
+    "apmlSpecVersion": "1.1.0"
+  },
+  "seeds": [...],      // 668 SEED_PAIRS
+  "legoBaskets": [...]  // Extracted building blocks
+}
+```
+
+# =============================================================================
+# CURRICULUM PACING ALGORITHMS
+# =============================================================================
+
+## Daily Seed Allocation
+
+```javascript
+function calculateDailyAllocation(courseDuration: CourseDuration): DailyPacing {
+  const totalSeeds = 668
+  const seedsPerDay = Math.floor(totalSeeds / courseDuration)
+
+  return {
+    30: {
+      seedsPerDay: 22,
+      reviewSeeds: 15,
+      sessionMinutes: 20
+    },
+    60: {
+      seedsPerDay: 11,
+      reviewSeeds: 20,
+      sessionMinutes: 15
+    },
+    90: {
+      seedsPerDay: 7,
+      reviewSeeds: 20,
+      sessionMinutes: 12
+    },
+    100: {
+      seedsPerDay: 7,
+      reviewSeeds: 20,
+      sessionMinutes: 10,
+      reviewDays: 10  // Built-in consolidation days
+    }
+  }[courseDuration]
+}
+```
+
+## Spaced Repetition Review
+
+```javascript
+function selectReviewSeeds(
+  dayNumber: number,
+  completedSeeds: number[],
+  masteryScores: Record<number, number>
+): number[] {
+  // Prioritize seeds with lower mastery scores
+  const seedsWithScores = completedSeeds.map(id => ({
+    id,
+    mastery: masteryScores[id] || 0,
+    daysSinceIntroduced: dayNumber - Math.floor((id - 1) / seedsPerDay) - 1
+  }))
+
+  // Sort by: (1) lowest mastery, (2) longest time since review
+  return seedsWithScores
+    .sort((a, b) => {
+      const masteryDiff = a.mastery - b.mastery
+      if (Math.abs(masteryDiff) > 0.1) return masteryDiff
+      return b.daysSinceIntroduced - a.daysSinceIntroduced
+    })
+    .slice(0, MAX_REVIEW_SEEDS_PER_DAY)
+    .map(s => s.id)
+}
+```
+
+## Mastery Scoring
+
+```javascript
+function updateMasteryScore(
+  seedId: number,
+  currentScore: number,
+  sessionPerformance: SessionPerformance
+): number {
+  // Factors: correct usage, hesitation, self-correction
+  const performanceFactor =
+    sessionPerformance.usedCorrectly ? 0.2 :
+    sessionPerformance.selfCorrected ? 0.1 :
+    sessionPerformance.coachCorrected ? -0.1 : 0
+
+  const newScore = Math.min(1.0, Math.max(0.0, currentScore + performanceFactor))
+
+  return newScore
+}
+```
+
+# =============================================================================
+# DEPLOYMENT & INFRASTRUCTURE
+# =============================================================================
+
+## Build Configuration
+
+```javascript
+// vite.config.ts
+export default defineConfig({
+  plugins: [vue()],
+  build: {
+    target: 'esnext',
+    outDir: 'dist',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['vue', 'vue-router'],
+          'voice': ['./src/services/humeVoice', './src/services/speechRecognition']
+        }
+      }
+    }
+  }
+})
+```
+
+## Environment Requirements
+
+```
+NODE_VERSION: >= 18.0.0
+PACKAGE_MANAGER: npm
+TARGET_BROWSERS:
+  - Chrome/Edge >= 90
+  - Safari >= 14
+  - Firefox >= 88
+
+REQUIRED_BROWSER_APIS:
+  - Web Speech API (for voice input)
+  - Web Audio API (for playback)
+  - MediaDevices API (microphone access)
+```
+
+## Deployment Targets
+
+```
+PRODUCTION:
+  - Platform: Vercel
+  - Domain: 100daysof.com (TBD)
+  - SSL: Automatic via Vercel
+  - CDN: Vercel Edge Network
+
+STAGING:
+  - Platform: Vercel Preview
+  - Domain: Auto-generated preview URLs
+
+DEVELOPMENT:
+  - Local: npm run dev (Vite dev server)
+  - Port: 5173 (default)
+  - API Proxy: Configured in vite.config.ts
+```
+
+# =============================================================================
+# COMPILATION & VALIDATION
+# =============================================================================
+
+## Deterministic Compilation
+
+```apml
+compile to production:
+  source: 100-days-of-language-learning.apml
+  target: Vue3 + TypeScript + Tailwind CSS
+
+  generate:
+    - src/App.vue (main application)
+    - src/router/index.ts (routing config)
+    - src/components/*.vue (UI components)
+    - src/services/*.ts (business logic)
+    - src/types/*.ts (TypeScript interfaces)
+    - api/*.ts (Vercel serverless functions)
+
+  validate:
+    - variable_registry_compliance: all identifiers defined
+    - pss_structure: compliant with PSS v1.0.0
+    - trinity_principle: all flows specified
+    - deterministic_output: identical on repeated compilation
+```
+
+## Validation Checklist
+
+```apml
+validate system_completeness:
+  check variable_registry:
+    verify all_components_defined
+    verify all_api_endpoints_specified
+    verify all_types_documented
+    verify no_undefined_identifiers
+
+  check pss_compliance:
+    verify interface_sections: 4 exist
+    verify data_structures_directory: exists
+    verify vfs_directory: exists with courses
+    verify PROJECT_DASHBOARD: generated
+    verify apml_registry: generated
+
+  check trinity_principle:
+    verify system_to_user_flows:
+      - UI displays all coach responses
+      - Progress indicators visible
+      - Error messages defined
+
+    verify user_to_system_flows:
+      - Voice input captured
+      - Text input handled
+      - Navigation specified
+      - Settings persistence
+
+    verify system_to_system_flows:
+      - Curriculum calculation logic
+      - API integrations (Hume.ai, Claude, SSi Dashboard)
+      - Database operations
+      - Session management
+
+  when all_validations_pass:
+    grant compilation_certification
+    enable production_deployment
+    activate user_testing_phase
+```
+
+# =============================================================================
+# VERSION HISTORY
+# =============================================================================
+
+VERSION: 1.0.0
+DATE: 2025-10-21
+STATUS: Initial APML SSoT Specification
+
+CHANGES:
+  - ✅ Complete system architecture defined
+  - ✅ Variable Registry established (APML v1.1.0 compliant)
+  - ✅ All 4 interface sections specified
+  - ✅ Curriculum pacing algorithms documented
+  - ✅ Hume.ai voice integration planned
+  - ✅ SSi Dashboard course content integration defined
+  - ✅ PSS v1.0.0 compliance achieved
+  - ✅ Trinity Principle validated
+
+NEXT_STEPS:
+  1. Compile APML to .apml-registry.json
+  2. Generate PROJECT-DASHBOARD.html
+  3. Build Interface Section 1 (Onboarding)
+  4. Build Interface Section 2 (Daily Practice + Voice Coach)
+  5. Integrate Hume.ai voice services
+  6. Connect to SSi Dashboard course API
+  7. User testing with 30-day Spanish course
+
+# =============================================================================
+# END OF APML SPECIFICATION
+# =============================================================================
