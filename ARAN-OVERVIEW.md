@@ -1,19 +1,26 @@
-# 100DaysOf Language Learning Platform
-**Accelerated Conversational Confidence Using SaySomethingIn Methodology + AI Voice Coach**
+# 100DaysOf - Expert Coaching Companion for SSi Learners
+**Managed Learning Coach System + AI Voice Practice Sessions**
 
 ---
 
 ## The Vision
 
-**A managed companion service that sits ALONGSIDE the main SSi course** - providing structure, accountability, and unlimited AI practice to help learners achieve interactional confidence in 30, 60, 90, or 100 days.
+**A managed learning coach system that works ALONGSIDE the SSi app** - providing expert coaching, structure, accountability, and unlimited AI voice practice sessions.
 
-**Critical:** This does NOT replace SSi courses. This is an **ADDITIONAL service** that:
-- Provides a managed learning schedule (30/60/90/100 day structure)
-- Adds AI voice coaching for unlimited practice
-- Tracks progress and maintains accountability
-- Complements SSi audio lessons with conversational practice
+**Critical Positioning:**
+- **SSi App = THE MAIN PRODUCT** (audio lessons, methodology, core learning)
+- **100DaysOf = EXPERT COACH COMPANION** (managed schedule, accountability, practice coaching)
 
-**Core Insight:** Learners still use SSi's proven method and audio lessons. We add the extra layer of managed coaching, practice, and accountability that helps them stay on track and practice what they're learning.
+**What This Is:**
+A **managed learning coach system** that provides:
+- **Expert coaching** on your SSi learning journey
+- **Structured schedule** (30/60/90/100 day plans)
+- **AI voice practice sessions** (conversational practice using learned vocabulary)
+- **Progress tracking** (accountability and motivation)
+- **Spaced repetition coaching** (optimize retention)
+
+**What This Is NOT:**
+This does NOT replace the SSi app or audio lessons. Learners still use SSi as their primary learning tool. We provide the coaching layer that helps them succeed.
 
 ---
 
@@ -100,24 +107,25 @@ Daily curriculum calculated → AI coach loaded with vocabulary → Voice practi
 
 ## Why This Is Revolutionary
 
-### **SSi Core Method (Unchanged):**
-Structured audio lessons → Learn building blocks → Practice methodology
+### **SSi App (THE MAIN PRODUCT - Unchanged):**
+Proven audio lessons → Learn building blocks → Practice methodology → Core teaching
 
-### **100DaysOf Companion Service (NEW LAYER):**
-- **Managed schedule** (30/60/90/100 day plan)
-- **AI practice coach** (24/7 conversational practice)
-- **Progress tracking** (accountability and motivation)
-- **Spaced repetition** (optimize retention)
+### **100DaysOf Expert Coach Companion (ADDITIONAL LAYER):**
+- **Managed learning schedule** (30/60/90/100 day coaching plans)
+- **AI voice practice sessions** (24/7 conversational practice coach)
+- **Expert progress coaching** (accountability, motivation, tracking)
+- **Spaced repetition coaching** (optimize retention)
 
-**Together:** SSi teaching method + 100DaysOf managed practice = Complete learning system
+**Together:** SSi app teaches + 100DaysOf coaches = Complete managed learning system
 
-**Key Advantages:**
-- **Always available** - no scheduling, no time zones
-- **Personalized pacing** - 30/60/90/100 day options
-- **Voice-first** - builds actual speaking confidence
-- **Bounded vocabulary** - coach never confuses learner with unknown phrases
+**Key Coaching Advantages:**
+- **Expert guidance** - Structured learning path keeps learners on track
+- **Always available** - AI practice coach available 24/7, no scheduling
+- **Personalized coaching** - 30/60/90/100 day plans match learner goals
+- **Voice practice sessions** - Build actual speaking confidence
+- **Bounded vocabulary** - Coach only uses phrases from SSi lessons
 - **Emotional encouragement** - Hume.ai voices adapt tone (encouraging, celebratory, supportive)
-- **Scales infinitely** - one AI coach serves unlimited learners
+- **Managed accountability** - Daily sessions, streak tracking, progress monitoring
 
 ---
 
