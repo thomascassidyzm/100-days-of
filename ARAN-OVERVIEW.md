@@ -5,9 +5,15 @@
 
 ## The Vision
 
-**Enable learners to achieve interactional confidence in 30, 60, 90, or 100 days** through daily prescriptive practice sessions with an AI voice coach that uses ONLY the vocabulary they've already learned from your SSi course material.
+**A managed companion service that sits ALONGSIDE the main SSi course** - providing structure, accountability, and unlimited AI practice to help learners achieve interactional confidence in 30, 60, 90, or 100 days.
 
-**Core Insight:** The SSi method works because learners master building blocks (LEGOs) and combine them naturally. We amplify this by giving them unlimited conversational practice with an AI coach that respects their exact vocabulary boundaries.
+**Critical:** This does NOT replace SSi courses. This is an **ADDITIONAL service** that:
+- Provides a managed learning schedule (30/60/90/100 day structure)
+- Adds AI voice coaching for unlimited practice
+- Tracks progress and maintains accountability
+- Complements SSi audio lessons with conversational practice
+
+**Core Insight:** Learners still use SSi's proven method and audio lessons. We add the extra layer of managed coaching, practice, and accountability that helps them stay on track and practice what they're learning.
 
 ---
 
@@ -94,11 +100,16 @@ Daily curriculum calculated → AI coach loaded with vocabulary → Voice practi
 
 ## Why This Is Revolutionary
 
-### **Current SSi Method:**
-Structured audio lessons → Learners practice with real humans (when available)
+### **SSi Core Method (Unchanged):**
+Structured audio lessons → Learn building blocks → Practice methodology
 
-### **100DaysOf Enhancement:**
-Same structured progression → **Unlimited AI practice partner available 24/7**
+### **100DaysOf Companion Service (NEW LAYER):**
+- **Managed schedule** (30/60/90/100 day plan)
+- **AI practice coach** (24/7 conversational practice)
+- **Progress tracking** (accountability and motivation)
+- **Spaced repetition** (optimize retention)
+
+**Together:** SSi teaching method + 100DaysOf managed practice = Complete learning system
 
 **Key Advantages:**
 - **Always available** - no scheduling, no time zones
