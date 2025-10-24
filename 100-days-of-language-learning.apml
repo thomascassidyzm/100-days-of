@@ -1101,5 +1101,25 @@ NEXT_STEPS:
   7. User testing with 30-day Spanish course
 
 # =============================================================================
+# EXTERNAL RESOURCES & DOCUMENTATION
+# =============================================================================
+
+## SaySomethingIn Credentials & Background
+
+STANDALONE_LINK:
+  url: /saysomethingin-credentials.html
+  file: /public/saysomethingin-credentials.html
+  title: "SaySomethingIn - Preparing you for the conversations that matter most"
+  description: "Comprehensive credentials document showcasing SSi's mission, method, proven track record (including Iaith ar Daith TV series and Welsh Government partnership), and proof of concept (Japanuary 10-day intensive, Cardiff University research)"
+  purpose: "Reference material for understanding the methodology and credibility behind the 100DaysOf platform"
+  key_highlights:
+    - 15+ years of language learning innovation
+    - Award-winning TV series (Iaith ar Daith) preparing celebrities for public performance
+    - Welsh Government National Centre partnership (since 2019)
+    - Proven accelerated learning (Japanuary: zero to conversation in 10 days)
+    - Cardiff University research validating method effectiveness
+  relevance: "The 100DaysOf platform is built on the SaySomethingIn methodology, proven to prepare learners for high-stakes linguistic moments through performance-focused training"
+
+# =============================================================================
 # END OF APML SPECIFICATION
 # =============================================================================
